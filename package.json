@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/breakfastitem/EmployeeManagement/issues"
   },
-  "homepage": "https://github.com/breakfastitem/EmployeeManagement#readme"
+  "homepage": "https://github.com/breakfastitem/EmployeeManagement#readme",
+  "dependencies": {
+    "mysql": "^2.18.1"
+  }
 }
