@@ -20,7 +20,7 @@ const connection = mysql.createConnection({
 inquirer.prompt([{
     type: "list",
     message: "What Would You Like to Do.",
-    choices: ["View All Employees","View All departments"],
+    choices: ["View All Employees","View All departments","View All roles"],
     name: "funct"
 }]).then((answers) => {
 
@@ -56,6 +56,27 @@ inquirer.prompt([{
             connection.query("SELECT * FROM department",(err,res)=>{
                 if (err) throw err;
                 console.table(res);
+
+            });
+            break;
+
+        case "View All roles":
+            connection.query(`
+            SELECT  
+            * 
+            FROM role
+             LEFT JOIN department ON role.department_id= department.id;`,(err,response)=>{
+                if (err) throw err;
+
+                let table = [];
+                for (let i = 0; i < response.length; i++) {
+                    let role = { id: i + 1 };
+                    role.title = response[i].title;
+                    role.salary = response[i].salary;
+                    role.department = response[i].name;
+                    table.push(role);
+                }
+                console.table(table);
 
             });
             break;
