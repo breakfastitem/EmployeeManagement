@@ -20,7 +20,7 @@ const connection = mysql.createConnection({
 inquirer.prompt([{
     type: "list",
     message: "What Would You Like to Do.",
-    choices: ["View All Employees"],
+    choices: ["View All Employees","View All departments"],
     name: "funct"
 }]).then((answers) => {
 
@@ -52,10 +52,14 @@ inquirer.prompt([{
 
             });
             break;
-    }
+        case "View All departments":
+            connection.query("SELECT * FROM department",(err,res)=>{
+                if (err) throw err;
+                console.table(res);
 
-
-
+            });
+            break;
+        }
 
 }
 
