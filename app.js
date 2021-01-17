@@ -51,15 +51,74 @@ function addRole(){
                 }
            ]).then((answers) => {
                 connection.query("INSERT INTO role (title,salary,department_id) SELECT ?,?, department.id FROM department WHERE ?=department.name;",
-                [answers.role,answers.salary,answers.department ],(err,response)=>{
+                [answers.role,answers.salary,answers.department ],(err)=>{
                     if (err) throw err;
                     
                 });
             });
 
         });
-
    
+}
+
+function addEmployeee(){
+
+    connection.query("SELECT role.title AS name FROM role;",(err,roles) => {
+        if (err) throw err;
+        connection.query("SELECT CONCAT(employee.id,' ',employee.first_name,' ',employee.last_name) AS name FROM employee;", (err,managers)=>{
+            if (err) throw err;
+            inquirer.prompt([
+                {
+                    type: "input",
+                    message: "What is the new employees first Name?",
+                    name: "first"
+                },
+                {
+                    type: "input",
+                    message: "What is the new employees last Name?",
+                    name: "last"
+                },
+                {
+                    type: "list",
+                    message: "Which role is this employee in?",
+                    choices: [...roles] ,
+                    name: "role"
+                },
+                {
+                    type: "list",
+                    message: "Who is this employees manager?",
+                    choices: ["null",...managers] ,
+                    name: "manager"
+                }
+           ]).then((answers) => {
+               if(answers.manager=="null"){
+                connection.query(`INSERT INTO employee (first_name,last_name,manager_id,role_id) 
+                SELECT ? ,? ,NULL, role.id 
+                FROM role
+                WHERE ?=role.title;`,
+                [answers.first,answers.last,answers.role],(err)=>{
+                    if (err) throw err;
+                    
+                });
+               }else{
+        
+                   connection.query(`INSERT INTO employee (first_name,last_name,manager_id,role_id) 
+                   SELECT ? ,? ,employee.id , role.id 
+                   FROM employee
+                   INNER JOIN role ON ?=role.title
+                   WHERE  ?=employee.id;`,
+                   [answers.first,answers.last,answers.role,answers.manager.split(" ")[0]],(err)=>{
+                       if (err) throw err;
+                       
+                   });
+               }
+               
+            });
+
+        });
+       
+    });
+        
 }
 
 
@@ -69,7 +128,7 @@ function menuPrompt() {
     inquirer.prompt([{
         type: "list",
         message: "What Would You Like to Do.",
-        choices: ["View All Employees", "View All departments", "View All roles", "Add department","Add Role"],
+        choices: ["View All Employees", "View All departments", "View All roles", "Add department","Add Role","Add Employee"],
         name: "funct"
     }]).then((answers) => {
 
@@ -103,6 +162,9 @@ function menuPrompt() {
                 break;
             case "Add Role":
                 addRole();
+                break;
+            case "Add Employee":
+                addEmployeee();
                 break;
         }
 
