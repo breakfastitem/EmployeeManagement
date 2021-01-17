@@ -16,15 +16,15 @@ const connection = mysql.createConnection({
     database: "employees_db"
 });
 
-function addDepartment(){
+function addDepartment() {
     inquirer.prompt([{
         type: "input",
         message: "What is the new department name?",
-        name:"department"
-    }]).then((answers)=>{
+        name: "department"
+    }]).then((answers) => {
         connection.query(`INSERT INTO department (name)
-        VALUES (?)`,[answers.department],(err)=>{
-            if(err) throw err;
+        VALUES (?)`, [answers.department], (err) => {
+            if (err) throw err;
         });
     });
 }
@@ -36,36 +36,19 @@ function menuPrompt() {
     inquirer.prompt([{
         type: "list",
         message: "What Would You Like to Do.",
-        choices: ["View All Employees", "View All departments", "View All roles","Add department"],
+        choices: ["View All Employees", "View All departments", "View All roles", "Add department"],
         name: "funct"
     }]).then((answers) => {
 
         switch (answers.funct) {
             case "View All Employees":
                 connection.query(`
-                SELECT 
-                    *
-                FROM role
-
-                RIGHT JOIN employee ON employee.role_id= role.id
-                INNER JOIN department ON role.department_id=department.id;`, (err, response) => {
-                    if (err) throw err;
-                    let table = [];
-                    for (let i = 0; i < response.length; i++) {
-                        let employee = { id: i + 1 };
-                        employee.first_name = response[i].first_name;
-                        employee.last_name = response[i].last_name;
-                        employee.title = response[i].title;
-                        employee.department = response[i].name;
-                        if (response[i].manager_id) {
-                            employee.manager = response[response[i].manager_id - 1].first_name + " " + response[response[i].manager_id - 1].last_name;
-                        } else {
-                            employee.manager = "NULL";
-                        }
-                        table.push(employee);
-                    }
-                    console.table(table);
-
+                SELECT t1.id, t1.first_name, t1.last_name, role.title, department.name, role.salary, CONCAT(t2.first_name," ",t2.last_name) AS manager FROM employee t1
+                INNER JOIN role ON t1.role_id =role.id
+                INNER JOIN department ON role.department_id=department.id
+                LEFT JOIN employee t2 ON t1.manager_id =t2.id;`, (err, response) => {
+                    if (err) throw err;   
+                    console.table(response);
                 });
                 break;
             case "View All departments":
