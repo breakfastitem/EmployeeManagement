@@ -25,6 +25,7 @@ function addDepartment() {
         connection.query(`INSERT INTO department (name)
         VALUES (?)`, [answers.department], (err) => {
             if (err) throw err;
+            menuPrompt();
         });
     });
 }
@@ -53,7 +54,7 @@ function addRole(){
                 connection.query("INSERT INTO role (title,salary,department_id) SELECT ?,?, department.id FROM department WHERE ?=department.name;",
                 [answers.role,answers.salary,answers.department ],(err)=>{
                     if (err) throw err;
-                    
+                    menuPrompt();
                 });
             });
 
@@ -98,7 +99,7 @@ function addEmployeee(){
                 WHERE ?=role.title;`,
                 [answers.first,answers.last,answers.role],(err)=>{
                     if (err) throw err;
-                    
+                    menuPrompt();
                 });
                }else{
         
@@ -109,7 +110,7 @@ function addEmployeee(){
                    WHERE  ?=employee.id;`,
                    [answers.first,answers.last,answers.role,answers.manager.split(" ")[0]],(err)=>{
                        if (err) throw err;
-                       
+                       menuPrompt();
                    });
                }
                
@@ -128,7 +129,7 @@ function menuPrompt() {
     inquirer.prompt([{
         type: "list",
         message: "What Would You Like to Do.",
-        choices: ["View All Employees", "View All departments", "View All roles", "Add department","Add Role","Add Employee"],
+        choices: ["View All Employees", "View All departments", "View All roles", "Add department","Add Role","Add Employee","Exit"],
         name: "funct"
     }]).then((answers) => {
 
@@ -141,12 +142,15 @@ function menuPrompt() {
                 LEFT JOIN employee t2 ON t1.manager_id =t2.id;`, (err, response) => {
                     if (err) throw err;   
                     console.table(response);
+
+                    menuPrompt();
                 });
                 break;
             case "View All departments":
                 connection.query("SELECT * FROM department", (err, res) => {
                     if (err) throw err;
                     console.table(res);
+                    menuPrompt();
                 });
                 break;
 
@@ -155,6 +159,7 @@ function menuPrompt() {
                 INNER JOIN department ON role.department_id= department.id;`, (err, response) => {
                     if (err) throw err;
                     console.table(response);
+                    menuPrompt();
                 });
                 break;
             case "Add department":
@@ -165,6 +170,9 @@ function menuPrompt() {
                 break;
             case "Add Employee":
                 addEmployeee();
+                break;
+            case "Exit":
+                connection.end();
                 break;
         }
 
