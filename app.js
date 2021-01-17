@@ -29,6 +29,39 @@ function addDepartment() {
     });
 }
 
+function addRole(){
+    connection.query(`SELECT department.name FROM department;`,(err,response) => {
+            if (err) throw err;
+            inquirer.prompt([
+                {
+                    type: "input",
+                    message: "What is the new role name?",
+                    name: "role"
+                },
+                {
+                    type: "input",
+                    message: "What is the new role salary?",
+                    name: "salary"
+                },
+                {
+                    type: "list",
+                    message: "Which department is this role in?",
+                    choices: [...response] ,
+                    name: "department"
+                }
+           ]).then((answers) => {
+                connection.query("INSERT INTO role (title,salary,department_id) SELECT ?,?, department.id FROM department WHERE ?=department.name;",
+                [answers.role,answers.salary,answers.department ],(err,response)=>{
+                    if (err) throw err;
+                    
+                });
+            });
+
+        });
+
+   
+}
+
 
 
 function menuPrompt() {
@@ -36,7 +69,7 @@ function menuPrompt() {
     inquirer.prompt([{
         type: "list",
         message: "What Would You Like to Do.",
-        choices: ["View All Employees", "View All departments", "View All roles", "Add department"],
+        choices: ["View All Employees", "View All departments", "View All roles", "Add department","Add Role"],
         name: "funct"
     }]).then((answers) => {
 
@@ -67,6 +100,9 @@ function menuPrompt() {
                 break;
             case "Add department":
                 addDepartment();
+                break;
+            case "Add Role":
+                addRole();
                 break;
         }
 
