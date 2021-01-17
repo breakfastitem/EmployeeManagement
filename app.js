@@ -55,28 +55,14 @@ function menuPrompt() {
                 connection.query("SELECT * FROM department", (err, res) => {
                     if (err) throw err;
                     console.table(res);
-
                 });
                 break;
 
             case "View All roles":
-                connection.query(`
-            SELECT  
-            * 
-            FROM role
-             LEFT JOIN department ON role.department_id= department.id;`, (err, response) => {
+                connection.query(`SELECT  role.id,role.title,role.salary,department.name AS department FROM role
+                INNER JOIN department ON role.department_id= department.id;`, (err, response) => {
                     if (err) throw err;
-
-                    let table = [];
-                    for (let i = 0; i < response.length; i++) {
-                        let role = { id: i + 1 };
-                        role.title = response[i].title;
-                        role.salary = response[i].salary;
-                        role.department = response[i].name;
-                        table.push(role);
-                    }
-                    console.table(table);
-
+                    console.table(response);
                 });
                 break;
             case "Add department":
