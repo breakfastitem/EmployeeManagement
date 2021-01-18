@@ -122,6 +122,42 @@ function addEmployeee(){
         
 }
 
+function updateEmployeeRole(){
+    connection.query("SELECT role.title AS name FROM role;",(err,roles) => {
+        if (err) throw err;
+        connection.query("SELECT CONCAT(employee.id,' ',employee.first_name,' ',employee.last_name) AS name FROM employee;", (err,employees)=>{
+            if (err) throw err;
+            inquirer.prompt([
+                {
+                    type: "list",
+                    message: "Which employee is being updated?",
+                    choices: [...employees] ,
+                    name: "employee"
+                },
+                {
+                    type: "list",
+                    message: "Which role is this employee in?",
+                    choices: [...roles] ,
+                    name: "role"
+                },
+                
+           ]).then((answers)=>{
+               connection.query(`UPDATE employee
+               INNER JOIN role ON ?=role.title
+                SET employee.role_id=role.id
+                WHERE ?=employee.id;
+               `,[answers.role,answers.employee.split(" ")[0]],(err)=>{
+                if(err) throw err;
+                menuPrompt();
+               });
+
+           });
+        });
+
+    });
+
+}
+
 
 
 function menuPrompt() {
@@ -129,7 +165,7 @@ function menuPrompt() {
     inquirer.prompt([{
         type: "list",
         message: "What Would You Like to Do.",
-        choices: ["View All Employees", "View All departments", "View All roles", "Add department","Add Role","Add Employee","Exit"],
+        choices: ["View All Employees", "View All departments", "View All roles", "Add department","Add Role","Add Employee","Update Employee Role","Exit"],
         name: "funct"
     }]).then((answers) => {
 
@@ -170,6 +206,9 @@ function menuPrompt() {
                 break;
             case "Add Employee":
                 addEmployeee();
+                break;
+            case "Update Employee Role":
+                updateEmployeeRole();
                 break;
             case "Exit":
                 connection.end();
