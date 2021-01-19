@@ -16,7 +16,11 @@ This repository contains a command line program that performs REST operations on
 
 ## Installation
 Downloading respository. In directory run npm install. This program requires mysql.
-Run init.sql in mysql to create database. Then if desired use sampleData.sql to insert sample data into the database.
+Run init.sql in mysql to create database. Then if desired use sampleData.sql to insert sample data into the database. Create a .env file to fill out desired fields for the mysql connection.
+
+This video demonstrates usage of the application.
+
+<iframe width="2379" height="1003" src="https://www.youtube.com/embed/pW-4HLfo8SE" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Usage
 After installation run node app.js. The user is then prompted with the available funcitons and exit button.
